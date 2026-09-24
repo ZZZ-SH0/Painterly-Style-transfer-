@@ -1,6 +1,6 @@
 import torch
 from torch import nn
-import kornia.geometry.transform as K
+import torchgeometry
 import torchvision.transforms as T
 import warnings
 import numpy as np
@@ -98,7 +98,7 @@ class RigidBodyTransformation(nn.Module):
         M = rigid_body_transform(self.a[0], self.xt[0]*(w/2), self.yt[0]*(h/2), anchor_x, anchor_y)
         with warnings.catch_warnings(): # suppress annoing torchgeometry warning
             warnings.simplefilter("ignore")
-            return K.warp_perspective(x, M, dsize=(h,w))
+            return torchgeometry.warp_perspective(x, M, dsize=(h,w))
 
 class BrushStroke(nn.Module):
     def __init__(self, 
