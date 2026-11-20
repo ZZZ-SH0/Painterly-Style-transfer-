@@ -22,6 +22,7 @@ import clip
 import kornia as K
 
 from paint_utils import *
+from adaptive_placement import sample_adaptive_locations
 
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 #device = torch.device('cpu')
@@ -61,7 +62,34 @@ def parse_objective(objective_type, objective_data, p, weight=1.0):
 
 def plan(opt):
     global colors
-    painting = random_init_painting(current_canvas, opt.num_strokes)
+    if opt.adaptive_placement:
+        if not objective_data or not torch.is_tensor(objective_data[0]):
+            raise ValueError(
+                "--adaptive_placement requires the first objective_data item "
+                "to be an image (the NST image), not text features."
+            )
+        # Match the baseline's effective count: floor(sqrt(N)) squared.
+        adaptive_locations = sample_adaptive_locations(
+            objective_data[0],
+            n_strokes=opt.num_strokes,
+            alpha=opt.adaptive_alpha,
+            beta=opt.adaptive_beta,
+            window=opt.adaptive_window,
+            sigma=opt.adaptive_sigma,
+            epsilon=opt.adaptive_epsilon,
+            uniform_mix=opt.adaptive_uniform_mix,
+            seed=opt.adaptive_seed,
+            diag_dir=opt.adaptive_diag_dir,
+        )
+        painting = init_painting_from_locations(
+            current_canvas, adaptive_locations
+        )
+        print("Adaptive placement initialized {} strokes.".format(
+            len(painting.brush_strokes)
+        ))
+    else:
+        # Original grid initializer remains unchanged as the baseline.
+        painting = random_init_painting(current_canvas, opt.num_strokes)
 
     painting.to(device)
 
