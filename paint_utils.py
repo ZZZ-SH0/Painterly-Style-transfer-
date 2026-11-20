@@ -258,6 +258,24 @@ def random_init_painting(background_img, n_strokes):
     return painting
 
 
+
+def init_painting_from_locations(background_img, xys):
+    """Create strokes at supplied normalized (x,y) centres.
+
+    BrushStroke receives only xt/yt, so all other stroke attributes retain
+    the same initialization behavior as random_init_painting().
+    """
+    brush_strokes = []
+    for x, y in xys:
+        brush_strokes.append(BrushStroke(
+            xt=torch.tensor(float(x)),
+            yt=torch.tensor(float(y))))
+    painting = Painting(0, background_img=background_img,
+                        brush_strokes=brush_strokes).to(device)
+    print("Initialized painting with adaptive brush-stroke centres!")
+    return painting
+
+
 def create_tensorboard():
     def new_tb_entry():
         import datetime

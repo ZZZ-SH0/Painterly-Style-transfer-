@@ -62,6 +62,27 @@ class Options(object):
 
 
         parser.add_argument('--num_strokes', type=int, default=500)
+
+        # Content-aware initial stroke placement (disabled by default).
+        parser.add_argument('--adaptive_placement', action='store_true',
+                            help='Sample initial stroke centres from image complexity.')
+        parser.add_argument('--adaptive_alpha', type=float, default=0.6,
+                            help='Weight for normalized Sobel edge magnitude.')
+        parser.add_argument('--adaptive_beta', type=float, default=0.4,
+                            help='Weight for normalized local variance.')
+        parser.add_argument('--adaptive_window', type=int, default=9,
+                            help='Odd window size for local variance.')
+        parser.add_argument('--adaptive_sigma', type=float, default=1.0,
+                            help='Gaussian smoothing sigma for density map.')
+        parser.add_argument('--adaptive_epsilon', type=float, default=0.05,
+                            help='Per-pixel probability floor before normalization.')
+        parser.add_argument('--adaptive_uniform_mix', type=float, default=0.15,
+                            help='Uniform probability mixture in [0,1].')
+        parser.add_argument('--adaptive_seed', type=int, default=42,
+                            help='Seed for adaptive position sampling only.')
+        parser.add_argument('--adaptive_diag_dir', type=str,
+                            default='adaptive_diagnostics',
+                            help='Directory for adaptive placement diagnostic images.')
         parser.add_argument('--n_stroke_models', type=int, default=1)
 
         parser.add_argument('--adaptive', action='store_true')
